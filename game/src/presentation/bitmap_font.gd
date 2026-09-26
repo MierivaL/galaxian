@@ -4,11 +4,21 @@ extends RefCounted
 
 static var desktop_fonts := {}
 
+static var settings := {
+	"force_vector_fonts": false,
+	"vector_font_scale": 1
+}
+
+static func useSettings(Settings) -> void:
+	settings = Settings
+	return
+
 
 static func create(library) -> FontFile:
 	var glyphs: Dictionary = library.radio_glyphs()
 	var height: int = glyphs.values()[0].size.y
-	if not is_mobile():
+	if use_vector_font():
+		height = height * vector_font_scale()
 		if not desktop_fonts.has(height):
 			var vector_font := ThemeDB.fallback_font.duplicate() as FontFile
 			vector_font.set_meta("source_height", height)
@@ -52,7 +62,8 @@ static func draw_text(
 ) -> void:
 	var glyphs: Dictionary = library.radio_glyphs()
 	var height: int = glyphs.values()[0].size.y
-	if not is_mobile():
+	if use_vector_font():
+		height = height * vector_font_scale()
 		var font := ThemeDB.fallback_font
 		# Keep authored line breaks, using a vector font at the source text size.
 		canvas.draw_string(
@@ -111,6 +122,12 @@ static func wrap_lines(library, text: String, width: float) -> PackedStringArray
 
 
 static var mobile_cache := -1
+
+static func use_vector_font() -> bool:
+	return settings["force_vector_fonts"] or not is_mobile()
+
+static func vector_font_scale() -> float:
+	return settings["vector_font_scale"]
 
 static func is_mobile() -> bool:
 	if mobile_cache < 0:

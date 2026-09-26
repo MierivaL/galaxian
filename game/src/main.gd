@@ -93,6 +93,8 @@ var settings := {
 	"touch": false,
 	"flight_overlays": true,
 	"extra_flight_buttons": true,
+	"force_vector_fonts": false,
+	"vector_font_scale": 1,
 	"linked_fire": false,
 	"touch_layout": {},
 	"fullscreen": false,
@@ -2005,7 +2007,8 @@ func show_options() -> void:
 				"linked_fire": "Fire all mounted primary weapons together",
 				"touch": "Show touch controls",
 				"flight_overlays": "Show flight text overlays",
-				"extra_flight_buttons": "Show extra flight buttons"
+				"extra_flight_buttons": "Show extra flight buttons",
+				"force_vector_fonts": "Force vector fonts"
 			}
 			. get(key, "")
 		)
@@ -2077,13 +2080,13 @@ func change_option(key: String, value: Variant) -> void:
 	elif key == "frame_rate" and DisplaySettings.FRAME_RATES.has(value):
 		settings.frame_rate = DisplaySettings.frame_rate_value(value)
 		DisplaySettings.apply_frame_rate(get_window(), settings.frame_rate)
-	elif key in ["music_volume", "effects_volume", "sensitivity", "motion_sensitivity"]:
+	elif key in ["music_volume", "effects_volume", "sensitivity", "motion_sensitivity", "vector_font_scale"]:
 		if not value is float and not value is int: return
 		if not is_finite(float(value)): return
 		settings[key] = clampf(float(value), .0005, .008) if key == "sensitivity" else clampf(float(value), 0, 1)
 		if key == "music_volume":
 			settings.music = settings.music_volume > 0
-	elif key in ["motion_steering", "invert", "original_flight_controls", "aim_assist", "linked_fire", "touch", "targeting_reticle", "flight_overlays", "extra_flight_buttons"] and value is bool:
+	elif key in ["motion_steering", "invert", "original_flight_controls", "aim_assist", "linked_fire", "touch", "targeting_reticle", "flight_overlays", "extra_flight_buttons", "force_vector_fonts"] and value is bool:
 		settings[key] = value
 	else:
 		return
@@ -2120,6 +2123,7 @@ func load_settings() -> void:
 	for key in ["music_volume", "effects_volume", "motion_sensitivity"]:
 		var value: Variant = settings[key]
 		settings[key] = clampf(float(value), 0, 1) if (value is float or value is int) and is_finite(float(value)) else 1.0
+	preload("res://src/presentation/bitmap_font.gd").useSettings(settings)
 
 
 func play_menu_music(title_context: bool) -> void:

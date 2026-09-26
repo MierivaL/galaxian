@@ -38,7 +38,8 @@ func label_for(key: String) -> String:
 		"language": "Language", "fullscreen": "Fullscreen", "aspect_ratio": "Aspect ratio",
 		"frame_rate": "Frame rate limit",
 		"flight_overlays": "Show flight text overlays", "extra_flight_buttons": "Show extra flight buttons",
-		"flight_hud": "Flight display",
+		"flight_hud": "Flight display", 
+		"force_vector_fonts": "Force vector fonts", "vector_font_scale": "Vector font scale",
 		"original_flight_controls": "Original flight controls",
 		"weapons": "Weapon controls",
 		"steering": "Steering settings",
@@ -58,11 +59,13 @@ func show_section(page: String, focus_key: String = "") -> void:
 		"motion": ["motion_steering", "motion_sensitivity", "calibrate_motion"],
 		"weapons": ["aim_assist", "linked_fire"],
 		"audio": ["effects_volume", "music_volume"],
-		"display": ["fullscreen", "aspect_ratio", "frame_rate", "flight_hud"],
+		"display": ["fullscreen", "aspect_ratio", "frame_rate", "flight_hud", "force_vector_fonts", "vector_font_scale"],
 		"flight_hud": ["targeting_reticle", "touch", "flight_overlays", "extra_flight_buttons"], "help": []
 	}.get(page, [])
 	if preload("res://src/presentation/bitmap_font.gd").is_mobile():
 		keys.erase("fullscreen")
+	else:
+		keys.erase("force_vector_fonts")
 	for key in keys:
 		var caption_key: String = {"music_volume": "music", "effects_volume": "effects"}.get(key, key)
 		var caption := label_for(caption_key)
@@ -106,7 +109,7 @@ func show_section(page: String, focus_key: String = "") -> void:
 		var button: Button = buttons[index]
 		button.position.y = row_y
 		row_y += row_steps[index]
-		if key in ["music_volume", "effects_volume", "sensitivity", "motion_sensitivity"]:
+		if key in ["music_volume", "effects_volume", "sensitivity", "motion_sensitivity", "vector_font_scale"]:
 			var slider := add_slider(button, key, str(entries[index].text))
 			focus_controls.append(slider)
 		elif values.get(key) is bool:
